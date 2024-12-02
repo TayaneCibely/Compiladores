@@ -8,27 +8,31 @@ import java.util.regex.*;
  */
 public class Lexer {
     // Palavras-chave suportadas pela linguagem
-    private static final Set<String> PALAVRAS_CHAVE = Set.of("se", "senao", "enquanto", "retorne");
+    private static final Set<String> PALAVRAS_CHAVE = Set.of("main", "end", "int", "bool", "procedure", "function", "return"
+            ,"while", "scanf", "printf", "break", "continue"
+     );
 
-    // Operadores reconhecidos
-    private static final Set<String> OPERADORES = Set.of("+", "-", "*", "/", "=");
+    private static final Set<String> LOGICOS = Set.of("or", "not", "and", "true", "false");
 
-    // Símbolos reconhecidos
-    private static final Set<Character> SIMBOLOS = Set.of(';', '(', ')', '{', '}');
+    private static final Set<String> CONDICIONAIS = Set.of("if", "else");
 
-    // Padrões para números e identificadores
+    private static final Set<String> OPERADORES = Set.of(
+            "*", "+", "-", "/", "==", "=", "<", "<=", ">", ">=", "%"
+    );
+
+    private static final Set<String> DELIMITADORES = Set.of(
+            "{", "}", ",", ";", "(", ")", "“", "”"
+    );
+
     private static final Pattern PADRAO_NUMERO = Pattern.compile("\\d+");
     private static final Pattern PADRAO_IDENTIFICADOR = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
 
-    private final String codigoFonte; // Código fonte que será analisado
+    private final String codigoFonte;
 
     public Lexer(String codigoFonte) {
         this.codigoFonte = codigoFonte;
     }
 
-    /**
-     * Realiza a análise léxica no código-fonte e retorna a lista de tokens.
-     */
     public List<Token> analisar() {
         List<Token> tokens = new ArrayList<>();
         int tamanho = codigoFonte.length();
@@ -36,13 +40,12 @@ public class Lexer {
         for (int i = 0; i < tamanho; ) {
             char caractereAtual = codigoFonte.charAt(i);
 
-            // Ignorar espaços em branco
+
             if (Character.isWhitespace(caractereAtual)) {
                 i++;
                 continue;
             }
 
-            // Identificar palavras-chave e identificadores
             if (Character.isLetter(caractereAtual) || caractereAtual == '_') {
                 StringBuilder identificador = new StringBuilder();
                 while (i < tamanho && (Character.isLetterOrDigit(codigoFonte.charAt(i)) || codigoFonte.charAt(i) == '_')) {
@@ -52,13 +55,16 @@ public class Lexer {
                 String valor = identificador.toString();
                 if (PALAVRAS_CHAVE.contains(valor)) {
                     tokens.add(new Token(TipoToken.PALAVRA_CHAVE, valor));
+                } else if (CONDICIONAIS.contains(valor)) {
+                    tokens.add(new Token(TipoToken.CONDICIONAIS, valor));
+                } else if (LOGICOS.contains(valor)) {
+                    tokens.add(new Token(TipoToken.LOGICO, valor));
                 } else {
                     tokens.add(new Token(TipoToken.IDENTIFICADOR, valor));
                 }
                 continue;
             }
 
-            // Identificar números
             if (Character.isDigit(caractereAtual)) {
                 StringBuilder numero = new StringBuilder();
                 while (i < tamanho && Character.isDigit(codigoFonte.charAt(i))) {
@@ -69,7 +75,6 @@ public class Lexer {
                 continue;
             }
 
-            // Identificar operadores
             String operador = String.valueOf(caractereAtual);
             if (OPERADORES.contains(operador)) {
                 tokens.add(new Token(TipoToken.OPERADOR, operador));
@@ -77,14 +82,19 @@ public class Lexer {
                 continue;
             }
 
-            // Identificar símbolos
-            if (SIMBOLOS.contains(caractereAtual)) {
-                tokens.add(new Token(TipoToken.SIMBOLO, String.valueOf(caractereAtual)));
+            if(DELIMITADORES.contains(String.valueOf(caractereAtual))){
+                tokens.add(new Token(TipoToken.DELIMITADOR, String.valueOf(caractereAtual)));
                 i++;
                 continue;
             }
 
-            // Token desconhecido
+//            if (LOGICOS.contains(String.valueOf(caractereAtual))){
+//                tokens.add(new Token(TipoToken.LOGICO, String.valueOf(caractereAtual)));
+//                i++;
+//                continue;
+//            }
+
+
             tokens.add(new Token(TipoToken.DESCONHECIDO, String.valueOf(caractereAtual)));
             i++;
         }

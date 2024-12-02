@@ -6,9 +6,14 @@ public class Main {
     public static void main(String[] args) {
         // Exemplo de código-fonte para teste
         String codigoFonte = """
-            se (x == 10) {
-                retorne x + 5;
+           main meuPrograma1(){
+            int i = 1;
+            while(i<=10){
+                if(i % 2 == 0){
+                    print(“i”);
+                }
             }
+           }end
         """;
 
         // Inicializa o Lexer e realiza a análise léxica
