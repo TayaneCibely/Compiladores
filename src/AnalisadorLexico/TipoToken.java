@@ -1,4 +1,4 @@
-package lexer;
+package AnalisadorLexico;
 
 /**
  * Enumeração para os diferentes tipos de tokens reconhecidos pelo Lexer.

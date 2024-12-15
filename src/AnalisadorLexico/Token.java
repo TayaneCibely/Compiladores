@@ -1,4 +1,4 @@
-package lexer;
+package AnalisadorLexico;
 
 public class Token {
     private final TipoToken tipo;

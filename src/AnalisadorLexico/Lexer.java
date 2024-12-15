@@ -1,4 +1,4 @@
-package lexer;
+package AnalisadorLexico;
 
 import java.util.*;
 import java.util.regex.*;

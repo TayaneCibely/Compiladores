@@ -1,4 +1,4 @@
-import lexer.*;
+import AnalisadorLexico.*;
 
 import java.util.List;
 
