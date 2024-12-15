@@ -10,7 +10,7 @@ public class Lexer {
     // Palavras-chave suportadas pela linguagem
     private static final Set<String> PALAVRAS_CHAVE = Set.of("main", "end", "int", "bool", "procedure", "function", "return"
             ,"while", "scanf", "printf", "break", "continue"
-     );
+    );
 
     private static final Set<String> LOGICOS = Set.of("or", "not", "and", "true", "false");
 
@@ -36,10 +36,16 @@ public class Lexer {
     public List<Token> analisar() {
         List<Token> tokens = new ArrayList<>();
         int tamanho = codigoFonte.length();
+        int linhaAtual = 1;
 
         for (int i = 0; i < tamanho; ) {
             char caractereAtual = codigoFonte.charAt(i);
 
+            if (caractereAtual == '\n') {
+                linhaAtual++;
+                i++;
+                continue;
+            }
 
             if (Character.isWhitespace(caractereAtual)) {
                 i++;
@@ -54,13 +60,13 @@ public class Lexer {
                 }
                 String valor = identificador.toString();
                 if (PALAVRAS_CHAVE.contains(valor)) {
-                    tokens.add(new Token(TipoToken.PALAVRA_CHAVE, valor));
+                    tokens.add(new Token(TipoToken.PALAVRA_CHAVE, valor, linhaAtual));
                 } else if (CONDICIONAIS.contains(valor)) {
-                    tokens.add(new Token(TipoToken.CONDICIONAIS, valor));
+                    tokens.add(new Token(TipoToken.CONDICIONAIS, valor, linhaAtual));
                 } else if (LOGICOS.contains(valor)) {
-                    tokens.add(new Token(TipoToken.LOGICO, valor));
+                    tokens.add(new Token(TipoToken.LOGICO, valor, linhaAtual));
                 } else {
-                    tokens.add(new Token(TipoToken.IDENTIFICADOR, valor));
+                    tokens.add(new Token(TipoToken.IDENTIFICADOR, valor, linhaAtual));
                 }
                 continue;
             }
@@ -71,31 +77,24 @@ public class Lexer {
                     numero.append(codigoFonte.charAt(i));
                     i++;
                 }
-                tokens.add(new Token(TipoToken.NUMERO, numero.toString()));
+                tokens.add(new Token(TipoToken.NUMERO, numero.toString(), linhaAtual));
                 continue;
             }
 
             String operador = String.valueOf(caractereAtual);
             if (OPERADORES.contains(operador)) {
-                tokens.add(new Token(TipoToken.OPERADOR, operador));
+                tokens.add(new Token(TipoToken.OPERADOR, operador, linhaAtual));
                 i++;
                 continue;
             }
 
             if(DELIMITADORES.contains(String.valueOf(caractereAtual))){
-                tokens.add(new Token(TipoToken.DELIMITADOR, String.valueOf(caractereAtual)));
+                tokens.add(new Token(TipoToken.DELIMITADOR, String.valueOf(caractereAtual), linhaAtual));
                 i++;
                 continue;
             }
 
-//            if (LOGICOS.contains(String.valueOf(caractereAtual))){
-//                tokens.add(new Token(TipoToken.LOGICO, String.valueOf(caractereAtual)));
-//                i++;
-//                continue;
-//            }
-
-
-            tokens.add(new Token(TipoToken.DESCONHECIDO, String.valueOf(caractereAtual)));
+            tokens.add(new Token(TipoToken.DESCONHECIDO, String.valueOf(caractereAtual), linhaAtual));
             i++;
         }
 
