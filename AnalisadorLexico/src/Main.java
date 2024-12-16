@@ -1,27 +1,34 @@
 import lexer.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // Exemplo de código-fonte para teste
-        String codigoFonte = """
-           main meuPrograma1(){
-            int i = 1;
-            while(i<=10){
-                if(i % 2 == 0){
-                    print(“i”);
-                }
+        String caminhoArquivo = "ExemploCodigo/contador.txt";
+
+        // lê o conteúdo do arquivo
+        StringBuilder codigoFonte = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                codigoFonte.append(linha).append("\n");
             }
-           }end
-        """;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        System.out.println(codigoFonte);
 
         // Inicializa o Lexer e realiza a análise léxica
-        Lexer analisadorLexico = new Lexer(codigoFonte);
+        Lexer analisadorLexico = new Lexer(codigoFonte.toString());
         List<Token> tokens = analisadorLexico.analisar();
 
         // Exibe os tokens gerados
-        System.out.println("Tokens gerados:");
+        System.out.println("\nTokens gerados:");
         tokens.forEach(System.out::println);
     }
 }
