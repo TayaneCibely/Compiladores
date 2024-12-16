@@ -3,10 +3,12 @@ package lexer;
 public class Token {
     private final TipoToken tipo;
     private final String valor;
+    private final int linha;
 
-    public Token(TipoToken tipo, String valor){
+    public Token(TipoToken tipo, String valor, int linha){
         this.tipo = tipo;
         this.valor = valor;
+        this.linha = linha;
     }
 
     public TipoToken getTipo() {
@@ -17,8 +19,12 @@ public class Token {
         return valor;
     }
 
+    public int getLinha(){
+        return linha;
+    }
+
     @Override
     public String toString(){
-        return String.format("Token(tipo=%s, valor='%s')", tipo, valor);
+        return String.format("Token(tipo=%s, valor='%s', linha=%d)", tipo, valor, linha);
     }
 }
