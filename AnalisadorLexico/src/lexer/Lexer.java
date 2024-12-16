@@ -21,8 +21,12 @@ public class Lexer {
     );
 
     private static final Set<String> DELIMITADORES = Set.of(
-            "{", "}", ",", ";", "(", ")", "“", "”"
+            "{", "}", ",", ";", "“", "”"
     );
+
+    private static final Set<String> ABRE_PAREN = Set.of("(");
+
+    private static final Set<String> FECHA_PAREN = Set.of(")");
 
     private static final Pattern PADRAO_NUMERO = Pattern.compile("\\d+");
 
@@ -91,6 +95,18 @@ public class Lexer {
 
             if(DELIMITADORES.contains(String.valueOf(caractereAtual))){
                 tokens.add(new Token(TipoToken.DELIMITADOR, String.valueOf(caractereAtual), linhaAtual));
+                i++;
+                continue;
+            }
+
+            if (ABRE_PAREN.contains(String.valueOf(caractereAtual))) {
+                tokens.add(new Token(TipoToken.ABRE_PAREN, "(", linhaAtual));
+                i++;
+                continue;
+            }
+
+            if (FECHA_PAREN.contains(String.valueOf(caractereAtual))) {
+                tokens.add(new Token(TipoToken.FECHA_PAREN, ")", linhaAtual));
                 i++;
                 continue;
             }
