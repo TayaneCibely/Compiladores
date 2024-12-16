@@ -1,10 +1,9 @@
 package lexer;
 
-/**
- * Enumeração para os diferentes tipos de tokens reconhecidos pelo Lexer.
- */
 public enum TipoToken {
     PALAVRA_CHAVE,   // Ex: while, return
+    ABRE_PAREN,
+    FECHA_PAREN,
     LOGICO,          // Ex: and, or
     CONDICIONAIS,    // Ex: if, else
     IDENTIFICADOR,   // Ex: variáveis e nomes de funções
@@ -12,5 +11,4 @@ public enum TipoToken {
     OPERADOR,        // Ex: +, -, *, /
     DELIMITADOR,     // Ex: , ;
     DESCONHECIDO     // Qnualquer token que ão é reconhecido
-
 }
