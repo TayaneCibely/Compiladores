@@ -1,8 +1,8 @@
-import lexer.*;
+import AnalisadorSintatico.*;
+import AnalisadorLexico.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.util.List;
 
 public class Main {
@@ -30,5 +30,11 @@ public class Main {
         // Exibe os tokens gerados
         System.out.println("\nTokens gerados:");
         tokens.forEach(System.out::println);
+        System.out.println("\nLista de tokens antes do parse:"); 
+        tokens.forEach(token -> System.out.println(token.getTipo() + " " + token.getValor()));
+
+        // Inicializa o Parser e realiza a análise sintática
+        Parser analisadorSintatico = new Parser(tokens);
+        analisadorSintatico.parse();
     }
 }
