@@ -19,12 +19,10 @@ public class Token {
         return valor;
     }
 
-    public int getLinha(){
-        return linha;
-    }
+    public int getLinha(){ return linha; }
 
     @Override
     public String toString(){
-        return String.format("Token(tipo=%s, valor='%s', linha=%d)", tipo, valor, linha);
+        return String.format("Token(tipo=%s, lexema='%s', linha=%d)", tipo, valor, linha);
     }
 }
