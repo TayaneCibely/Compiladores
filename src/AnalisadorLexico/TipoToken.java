@@ -26,7 +26,9 @@ public enum TipoToken {
     ELSE,            // Ex: else
     IDENTIFICADOR,   // Ex: variáveis e nomes de funções
     NUMERO,          // Ex: 123, 456
-    OPERADOR,        // Ex: +, -, *, /
+    OPE_ARIT,        // Ex: +, -, *, /
+    OPE_ATRI,        // Ex: =
+    OPE_REL,        // Ex: ==, <, >, <=, >=
     DELIMITADOR,     // Ex: , ;
     DESCONHECIDO     // Qualquer token que ão é reconhecido
 }

@@ -12,7 +12,7 @@ public class Token {
     }
 
     public TipoToken getTipo() {
-        return tipo;
+        return tipo; 
     }
 
     public String getValor(){

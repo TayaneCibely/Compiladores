@@ -41,9 +41,13 @@ public class Lexer {
 
     private static final Set<String> ELSE = Set.of("else");
 
-    private static final Set<String> OPERADORES = Set.of("*", "+", "-", "/", "==", "=", "<", "<=", ">", ">=", "%");
+    private static final Set<String> OPE_ARIT = Set.of("*", "+", "-", "/", "=", "%");
 
-    private static final Set<String> DELIMITADORES = Set.of(",", ";");
+    private static final Set<String> OPE_ATRI = Set.of("=");
+    
+    private static final Set<String> OPE_REL = Set.of("==", "<", ">", ">=", "<=");
+
+    private static final Set<String> DELIMITADORES = Set.of(",", ";", ":");
 
     private static final Set<String> ABRE_PAREN = Set.of("(");
 
@@ -137,8 +141,20 @@ public class Lexer {
                 continue;
             }
 
-            if (OPERADORES.contains(String.valueOf(currentChar))) {
-                tokens.add(new Token(TipoToken.OPERADOR, String.valueOf(currentChar), linhaAtual));
+            if (OPE_ATRI.contains(String.valueOf(currentChar))) {
+                tokens.add(new Token(TipoToken.OPE_ATRI, String.valueOf(currentChar), linhaAtual));
+                pos++;
+                continue;
+            }
+
+            if (OPE_ARIT.contains(String.valueOf(currentChar))) {
+                tokens.add(new Token(TipoToken.OPE_ARIT, String.valueOf(currentChar), linhaAtual));
+                pos++;
+                continue;
+            }
+
+            if (OPE_REL.contains(String.valueOf(currentChar))) {
+                tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
                 pos++;
                 continue;
             }
