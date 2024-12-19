@@ -29,6 +29,7 @@ public enum TipoToken {
     OPE_ARIT,        // Ex: +, -, *, /
     OPE_ATRI,        // Ex: =
     OPE_REL,        // Ex: ==, <, >, <=, >=
-    DELIMITADOR,     // Ex: , ;
+    PON_VIR,         // Ex: ;
+    VIRGULA,     // Ex: ,
     DESCONHECIDO     // Qualquer token que ão é reconhecido
 }

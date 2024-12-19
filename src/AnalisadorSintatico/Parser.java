@@ -48,7 +48,7 @@ public class Parser {
                 parseExpressao();
             }
 
-            while (match(TipoToken.DELIMITADOR, ",")) {
+            while (match(TipoToken.VIRGULA, ",")) {
                 consume(TipoToken.INTEIRO,  "int", "Erro: Tipo esperado após ','");
                 consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo");
 
@@ -56,7 +56,7 @@ public class Parser {
                     parseExpressao();
                 }
             }
-            consume(TipoToken.DELIMITADOR, ";", "Erro: ';' esperado no final da declaração de variáveis");
+            consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado no final da declaração de variáveis");
         }else{
             throw new RuntimeException("Erro: Tipo de variável (int ou bool) esperado");
         }
@@ -83,19 +83,20 @@ public class Parser {
     }
 
     private void parseDeclaracaoFuncao() {
-        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após 'function'");
+        consume(TipoToken.FUNCAO, "Erro: Identificador esperado após 'function'");
+        consume(TipoToken.IDENTIFICADOR, "Erro: esperado um identificador");
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador da função");
         parseParametros();
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os parâmetros");
-        consume(TipoToken.DELIMITADOR, ":", "Erro: ':' esperado após os parâmetros");
-        consume(TipoToken.PALAVRA_CHAVE, "Erro: Tipo esperado após ':'");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado no início do bloco da função");
         parseBloco();
+        consume(TipoToken.RETORNO, "return", "Erro: esperado um return");
+        consume(TipoToken.PON_VIR, ";", "Erro: Falta um ponto e virgula ';'");
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco da função");
     }
 
     private void parseComandos() {
-        while (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if")) {
+        while (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if" )|| check(TipoToken.IDENTIFICADOR)) {
             parseComando();
         }
     }
@@ -110,8 +111,12 @@ public class Parser {
 
     private void parseComandoWhile() {
         consume(TipoToken.WHILE, "while");
+        consume(TipoToken.ABRE_PAREN, "Erro: '(' esperado após 'while' ");
         parseExpressao();
+        consume(TipoToken.FECHA_PAREN, "ERRO: ')' esperado após a expressão no 'while");
+        consume(TipoToken.ABRE_CHAVES,"Erro: '{' esperado após ')'");
         parseBloco();
+        consume(TipoToken.FECHA_CHAVES, "Erro: '}' esperado após o bloco do 'while'");
     }
 
     private void parseComandoIf() {
@@ -126,7 +131,6 @@ public class Parser {
     private void parseExpressao() {
         parseExpressaoSimples();
 
-        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado em expressão");
         if (peek() != null && peek().getTipo() == TipoToken.OPE_REL) {
             consume(TipoToken.OPE_REL, "Erro: Operador relacional esperado");
             parseExpressaoSimples();
@@ -167,7 +171,7 @@ public class Parser {
     private void parseParametros() {
         if (check(TipoToken.IDENTIFICADOR)) {
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado em parâmetros");
-            while (match(TipoToken.DELIMITADOR, ",")) {
+            while (match(TipoToken.VIRGULA, ",")) {
                 consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após ','");
             }
         }

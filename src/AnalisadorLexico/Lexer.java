@@ -47,7 +47,9 @@ public class Lexer {
     
     private static final Set<String> OPE_REL = Set.of("==", "<", ">", ">=", "<=");
 
-    private static final Set<String> DELIMITADORES = Set.of(",", ";", ":");
+    private static final Set<String> VIRGULA = Set.of(",");
+
+    private static final Set<String> PON_VIR = Set.of(";");
 
     private static final Set<String> ABRE_PAREN = Set.of("(");
 
@@ -159,8 +161,14 @@ public class Lexer {
                 continue;
             }
 
-            if (DELIMITADORES.contains(String.valueOf(currentChar))) {
-                tokens.add(new Token(TipoToken.DELIMITADOR, String.valueOf(currentChar), linhaAtual));
+            if (PON_VIR.contains(String.valueOf(currentChar))) {
+                tokens.add(new Token(TipoToken.PON_VIR, String.valueOf(currentChar), linhaAtual));
+                pos++;
+                continue;
+            }
+
+            if (VIRGULA.contains(String.valueOf(currentChar))) {
+                tokens.add(new Token(TipoToken.VIRGULA, String.valueOf(currentChar), linhaAtual));
                 pos++;
                 continue;
             }
