@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoArquivo = "ExemploCodigo/impar_par.txt";
+        String caminhoArquivo = "ExemploCodigo/multiplicacao.txt";
 
         // lê o conteúdo do arquivo
         StringBuilder codigoFonte = new StringBuilder();
@@ -30,11 +30,17 @@ public class Main {
         // Exibe os tokens gerados
         System.out.println("\nTokens gerados:");
         tokens.forEach(System.out::println);
-        System.out.println("\nLista de tokens antes do parse:"); 
-        tokens.forEach(token -> System.out.println(token.getTipo() + " " + token.getValor()));
 
-        // Inicializa o Parser e realiza a análise sintática
-        Parser analisadorSintatico = new Parser(tokens);
+       // System.out.println("\nLista de tokens antes do parse:"); 
+       // tokens.forEach(token -> System.out.println(token.getTipo() + " " + token.getValor()));
+
+        //Inicializa o Parser e realiza a análise sintática
+        TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
+        Parser analisadorSintatico = new Parser(tokens, tabelaSimbolos);
         analisadorSintatico.parse();
+
+        System.out.println("\nTabela de Símbolos:");
+        System.out.println(tabelaSimbolos);
+
     }
 }

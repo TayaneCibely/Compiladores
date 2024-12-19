@@ -6,13 +6,26 @@ import java.util.List;
 public class Parser {
     private final List<Token> tokens;
     private int pos = 0;
+    private TabelaSimbolos tabelaSimbolos;
 
-    public Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens, TabelaSimbolos tabelaSimbolos) {
         this.tokens = tokens;
+        this.tabelaSimbolos = tabelaSimbolos;
     }
 
-    public void parse() {
-        parsePrograma();
+    private void adicionarSimbolo(Token token, String tipo, String valor) {
+        if (token.getTipo() == TipoToken.IDENTIFICADOR) {
+            Simbolo simbolo = new Simbolo(token.getValor(), tipo, token.getLinha(), valor);
+            tabelaSimbolos.adicionarSimbolo(simbolo);
+        }
+    }
+     
+    public void parse() { 
+        try { parsePrograma(); 
+            System.out.println("Programa válido!!! \\-_-/"); 
+        } catch (RuntimeException e) { 
+            System.err.println("Erro de parsing: " + e.getMessage()); 
+        }
     }
 
     private void parsePrograma() {
@@ -24,7 +37,6 @@ public class Parser {
         parseBloco();
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após bloco");
         consume(TipoToken.END, "end", "Erro: 'end' esperado");
-        System.out.println("Programa válido!!!\uD83C\uDF87\uD83C\uDF87");
     }
 
     private void parseBloco() {
@@ -50,27 +62,39 @@ public class Parser {
 
     private void parseDeclaracaoVariavel() {
         if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
+            String tipo = tokens.get(pos).getValor();
             consume(peek().getTipo(), "Erro: Tipo de variável esperado");
+            
+            // Consome e adiciona o primeiro identificador
+            Token identificador = tokens.get(pos);
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo");
-
+        
+            String valor = null;
             if (match(TipoToken.OPE_ATRI, "=")) {
+                valor = tokens.get(pos).getValor();
                 parseExpressao();
             }
-
+            adicionarSimbolo(identificador, tipo, valor);
+            
+            // Verifica se há mais identificadores na declaração
             while (match(TipoToken.VIRGULA, ",")) {
+                identificador = tokens.get(pos);
                 consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após ','");
-
+        
                 if (match(TipoToken.OPE_ATRI, "=")) {
+                    valor = tokens.get(pos).getValor();
                     parseExpressao();
+                } else {
+                    valor = null;
                 }
+                adicionarSimbolo(identificador, tipo, valor);
             }
-
+        
             consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado no final da declaração de variáveis");
         } else {
             throw new RuntimeException("Erro: Tipo de variável (int ou bool) esperado");
         }
-    }
-
+    }       
 
     private void parseDeclaracaoSubrotinas() {
         while (check(TipoToken.PROCEDIMENTO) || check(TipoToken.FUNCAO)) {

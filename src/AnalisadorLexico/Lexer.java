@@ -91,21 +91,22 @@ public class Lexer {
 
             // verificador de string
             if (currentChar == '"') {
-                int start = pos + 1;
                 pos++;
                 StringBuilder conteudoString = new StringBuilder();
                 while (pos < tamanho && codigoFonte.charAt(pos) != '"') {
                     if (codigoFonte.charAt(pos) == '\n') {
                         linhaAtual++;
                     }
-                    conteudoString.append(codigoFonte.charAt(pos)); pos++;
+                    conteudoString.append(codigoFonte.charAt(pos)); 
+                    pos++;
                 }
                 if (pos < tamanho && codigoFonte.charAt(pos) == '"') {
                     pos++;
                     tokens.add(new Token(TipoToken.STRING, conteudoString.toString(), linhaAtual));
                 } else {
                     throw new RuntimeException("Erro: String não fechada na linha: " + linhaAtual);
-                } continue;
+                } 
+                continue;
             }
 
             Matcher matcher = PADRAO_IDENTIFICADOR.matcher(codigoFonte.substring(pos));
