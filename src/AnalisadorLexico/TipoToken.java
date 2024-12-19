@@ -10,7 +10,7 @@ public enum TipoToken {
     RETORNO,
     WHILE,
     SCANF,
-    PRINTF,
+    PRINT,
     BREAK,
     CONTINUE,
     VERDADEIRO,
@@ -25,6 +25,7 @@ public enum TipoToken {
     IF,              // Ex: if
     ELSE,            // Ex: else
     IDENTIFICADOR,   // Ex: variáveis e nomes de funções
+    STRING,
     NUMERO,          // Ex: 123, 456
     OPE_ARIT,        // Ex: +, -, *, /
     OPE_ATRI,        // Ex: =

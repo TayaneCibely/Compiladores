@@ -16,14 +16,14 @@ public class Parser {
     }
 
     private void parsePrograma() {
-        consume(TipoToken.MAIN, "main", "Erro: 'main' esperado"); 
-        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após 'main'"); 
-        consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após identificador"); 
-        consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após '('"); 
-        consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após ')'"); 
-        parseBloco(); 
-        consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após bloco"); 
-        consume(TipoToken.END, "end", "Erro: 'end' esperado"); 
+        consume(TipoToken.MAIN, "main", "Erro: 'main' esperado");
+        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após 'main'");
+        consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após identificador");
+        consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após '('");
+        consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após ')'");
+        parseBloco();
+        consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após bloco");
+        consume(TipoToken.END, "end", "Erro: 'end' esperado");
         System.out.println("Programa válido.");
     }
 
@@ -31,16 +31,16 @@ public class Parser {
         while (true) {
             if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
                 parseDeclaracaoVariaveis();
-            } else if (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
+            }  else if (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
                 parseDeclaracaoSubrotinas();
-            } else if (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if")) {
+            } else if (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if") || check(TipoToken.PRINT, "print")) {
                 parseComando();
             } else {
                 break;
             }
         }
     }
-    
+
 
     private void parseDeclaracaoVariaveis() {
         while (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
@@ -49,27 +49,28 @@ public class Parser {
     }
 
     private void parseDeclaracaoVariavel() {
-        if(check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")){
-            consume(TipoToken.INTEIRO, "int", "Erro: Tipo de variável esperado");
+        if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
+            consume(peek().getTipo(), "Erro: Tipo de variável esperado");
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo");
-            
+
             if (match(TipoToken.OPE_ATRI, "=")) {
                 parseExpressao();
             }
 
             while (match(TipoToken.VIRGULA, ",")) {
-                consume(TipoToken.INTEIRO,  "int", "Erro: Tipo esperado após ','");
-                consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo");
+                consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após ','");
 
                 if (match(TipoToken.OPE_ATRI, "=")) {
                     parseExpressao();
                 }
             }
+
             consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado no final da declaração de variáveis");
-        }else{
+        } else {
             throw new RuntimeException("Erro: Tipo de variável (int ou bool) esperado");
         }
     }
+
 
     private void parseDeclaracaoSubrotinas() {
         while (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
@@ -109,11 +110,12 @@ public class Parser {
             parseComandoWhile();
         } else if (check(TipoToken.IF, "if")) {
             parseComandoIf();
+        } else if (check(TipoToken.PRINT, "print")) {
+            parseComandoPrint();
         } else {
             throw new RuntimeException("Erro: Comando inválido");
         }
     }
-
 
     private void parseComandoWhile() {
         consume(TipoToken.WHILE, "while", "Erro: 'while' esperado");
@@ -123,15 +125,30 @@ public class Parser {
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após ')'");
         parseBloco();
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'while'");
-    }      
+    }
 
     private void parseComandoIf() {
-        consume(TipoToken.IF, "if");
+        consume(TipoToken.IF, "if", "Erro: 'if' esperado");
+        consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após 'if'");
         parseExpressao();
+        consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após a expressão");
+        consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após a expressão do 'if'");
         parseBloco();
+        consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'if'");
+
         if (match(TipoToken.ELSE, "else")) {
+            consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após 'else'");
             parseBloco();
+            consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'else'");
         }
+    }
+
+    private void parseComandoPrint() {
+        consume(TipoToken.PRINT, "Erro: 'print' esperado");
+        consume(TipoToken.ABRE_PAREN, "Erro: '(' esperado após 'print'");
+        consume(TipoToken.STRING, "Erro: 'string' esperado após '('");
+        consume(TipoToken.FECHA_PAREN, "Erro: ')' esperado após 'string'");
+        consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após o comando 'print'");
     }
 
     private void parseExpressao() {
@@ -145,7 +162,7 @@ public class Parser {
 
     private void parseExpressaoSimples(){
         parseTermo();
-        
+
         while (peek() != null && peek().getTipo() == TipoToken.OPE_ARIT) {
             consume(TipoToken.OPE_ARIT, "Erro: Operador aritmético esperado");
             parseTermo();
@@ -159,7 +176,7 @@ public class Parser {
                 (peek().getValor().equals("*") || peek().getValor().equals("/") || peek().getValor().equals("%"))) {
             consume(TipoToken.OPE_ARIT, "Erro: Operador de multiplicação/divisão esperado");
             parseFator();
-        }  
+        }
     }
 
     private void parseFator() {
@@ -172,7 +189,7 @@ public class Parser {
             throw new RuntimeException("Erro: Fator inválido na expressão");
         }
     }
-    
+
 
     private void parseParametros() {
         if (check(TipoToken.IDENTIFICADOR)) {
@@ -193,13 +210,16 @@ public class Parser {
     }
 
     private void consume(TipoToken tipo, String valor, String erro) {
-        System.out.println("Consumindo token esperado: " + tipo + " com valor: " + valor);
-        System.out.println("Próximo token: " + tokens.get(pos));
-        if (!check(tipo, valor)) {
+        if (!check(tipo)) {
+            System.out.println("Erro ao consumir token. Esperado: " + tipo + ", Encontrado: " + (peek() != null ? peek().getTipo() : "null"));
             throw new RuntimeException(erro);
         }
-        pos++;
-    }    
+        System.out.println("Consumindo token: " + tokens.get(pos));
+        pos++;  // Consome o token e avança
+        if (pos < tokens.size()) {
+            System.out.println("Próximo token: " + tokens.get(pos));
+        }
+    }
 
     private boolean check(TipoToken tipo) {
         return pos < tokens.size() && tokens.get(pos).getTipo() == tipo;
@@ -217,13 +237,13 @@ public class Parser {
         return false;
     }
 
-    //Metódos auxiliares para 
+    //Metódos auxiliares para
 
     //verificar o próximo token na lista de tokens sem consumi-lo
     private Token peek(){
         if (pos < tokens.size()) {
             return tokens.get(pos);
-            
+
         }
         return null;
     }

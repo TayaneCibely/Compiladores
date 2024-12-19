@@ -25,7 +25,7 @@ public class Lexer {
 
     private static final Set<String> SCANF = Set.of("scanf");
 
-    private static final Set<String> PRINTF = Set.of("printf");
+    private static final Set<String> PRINT = Set.of("print");
 
     private static final Set<String> BREAK = Set.of("break");
 
@@ -89,6 +89,25 @@ public class Lexer {
                 continue;
             }
 
+            // verificador de string
+            if (currentChar == '"') {
+                int start = pos + 1;
+                pos++;
+                StringBuilder conteudoString = new StringBuilder();
+                while (pos < tamanho && codigoFonte.charAt(pos) != '"') {
+                    if (codigoFonte.charAt(pos) == '\n') {
+                        linhaAtual++;
+                    }
+                    conteudoString.append(codigoFonte.charAt(pos)); pos++;
+                }
+                if (pos < tamanho && codigoFonte.charAt(pos) == '"') {
+                    pos++;
+                    tokens.add(new Token(TipoToken.STRING, conteudoString.toString(), linhaAtual));
+                } else {
+                    throw new RuntimeException("Erro: String não fechada na linha: " + linhaAtual);
+                } continue;
+            }
+
             Matcher matcher = PADRAO_IDENTIFICADOR.matcher(codigoFonte.substring(pos));
             if (matcher.lookingAt()) {
                 String identificador = matcher.group();
@@ -110,8 +129,8 @@ public class Lexer {
                     tokens.add(new Token(TipoToken.WHILE, identificador, linhaAtual));
                 } else if (SCANF.contains(identificador)) {
                     tokens.add(new Token(TipoToken.SCANF, identificador, linhaAtual));
-                } else if (PRINTF.contains(identificador)) {
-                    tokens.add(new Token(TipoToken.PRINTF, identificador, linhaAtual));
+                } else if (PRINT.contains(identificador)) {
+                    tokens.add(new Token(TipoToken.PRINT, identificador, linhaAtual));
                 } else if (BREAK.contains(identificador)) {
                     tokens.add(new Token(TipoToken.BREAK, identificador, linhaAtual));
                 } else if (CONTINUE.contains(identificador)) {
@@ -143,6 +162,15 @@ public class Lexer {
                 continue;
             }
 
+            if (pos + 1 < tamanho) {
+                String twoCharToken = codigoFonte.substring(pos, pos + 2);
+                if (twoCharToken.equals("==") || twoCharToken.equals(">=") || twoCharToken.equals("<=")) {
+                    tokens.add(new Token(TipoToken.OPE_REL, twoCharToken, linhaAtual));
+                    pos += 2;
+                    continue;
+                }
+            }
+
             if (OPE_ATRI.contains(String.valueOf(currentChar))) {
                 tokens.add(new Token(TipoToken.OPE_ATRI, String.valueOf(currentChar), linhaAtual));
                 pos++;
@@ -155,20 +183,12 @@ public class Lexer {
                 continue;
             }
 
-            if (pos + 1 < tamanho) {
-                String twoCharToken = codigoFonte.substring(pos, pos + 2);
-                if (twoCharToken.equals("==")) {
-                    tokens.add(new Token(TipoToken.OPE_REL, twoCharToken, linhaAtual));
-                    pos += 2; // Avança dois caracteres
-                    continue;
-                } else if (twoCharToken.equals(">=") || twoCharToken.equals("<=")) {
-                    tokens.add(new Token(TipoToken.OPE_REL, twoCharToken, linhaAtual));
-                    pos += 2; // Avança dois caracteres
-                    continue;
-                }
+            if (OPE_REL.contains(String.valueOf(currentChar))) {
+                tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
+                pos++;
+                continue;
             }
     
-            // Verifica se é um operador relacional de um caractere
             if (currentChar == '>') {
                 tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
                 pos++;
@@ -182,7 +202,7 @@ public class Lexer {
             }
     
             if (currentChar == '=') {
-                tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
+                tokens.add(new Token(TipoToken.OPE_ATRI, String.valueOf(currentChar), linhaAtual));
                 pos++;
                 continue;
             }

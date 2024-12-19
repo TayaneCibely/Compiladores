@@ -1,0 +1,8 @@
+main meuPrograma(){
+ 	procedure imprimirValor(int x){
+    	print(x);
+    }
+}
+end
+
+
