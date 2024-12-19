@@ -185,6 +185,7 @@ public class Parser {
 
     private void consume(TipoToken tipo, String erro) {
         if (!check(tipo)) {
+            System.out.println("Erro ao consumir token. Esperado: " + tipo + ", Encontrado: " + (peek() != null ? peek().getTipo() : "null"));
             throw new RuntimeException(erro);
         }
         System.out.println("Consumindo token: " + tokens.get(pos));

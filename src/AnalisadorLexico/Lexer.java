@@ -43,10 +43,10 @@ public class Lexer {
 
     private static final Set<String> OPE_ARIT = Set.of("*", "+", "-", "/", "=", "%");
 
+    private static final Set<String> OPE_REL = Set.of("==",  ">=",">", "<=", "<");
+
     private static final Set<String> OPE_ATRI = Set.of("=");
     
-    private static final Set<String> OPE_REL = Set.of("==", "<", ">", ">=", "<=");
-
     private static final Set<String> VIRGULA = Set.of(",");
 
     private static final Set<String> PON_VIR = Set.of(";");
@@ -155,7 +155,33 @@ public class Lexer {
                 continue;
             }
 
-            if (OPE_REL.contains(String.valueOf(currentChar))) {
+            if (pos + 1 < tamanho) {
+                String twoCharToken = codigoFonte.substring(pos, pos + 2);
+                if (twoCharToken.equals("==")) {
+                    tokens.add(new Token(TipoToken.OPE_REL, twoCharToken, linhaAtual));
+                    pos += 2; // Avança dois caracteres
+                    continue;
+                } else if (twoCharToken.equals(">=") || twoCharToken.equals("<=")) {
+                    tokens.add(new Token(TipoToken.OPE_REL, twoCharToken, linhaAtual));
+                    pos += 2; // Avança dois caracteres
+                    continue;
+                }
+            }
+    
+            // Verifica se é um operador relacional de um caractere
+            if (currentChar == '>') {
+                tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
+                pos++;
+                continue;
+            }
+    
+            if (currentChar == '<') {
+                tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
+                pos++;
+                continue;
+            }
+    
+            if (currentChar == '=') {
                 tokens.add(new Token(TipoToken.OPE_REL, String.valueOf(currentChar), linhaAtual));
                 pos++;
                 continue;
