@@ -24,7 +24,7 @@ public class Parser {
         parseBloco();
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após bloco");
         consume(TipoToken.END, "end", "Erro: 'end' esperado");
-        System.out.println("Programa válido.");
+        System.out.println("Programa válido!!!\uD83C\uDF87\uD83C\uDF87");
     }
 
     private void parseBloco() {
@@ -73,17 +73,18 @@ public class Parser {
 
 
     private void parseDeclaracaoSubrotinas() {
-        while (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
-            if (match(TipoToken.PROCEDIMENTO, "procedure")) {
+        while (check(TipoToken.PROCEDIMENTO) || check(TipoToken.FUNCAO)) {
+            if (check(TipoToken.PROCEDIMENTO)) {
                 parseDeclaracaoProcedimento();
-            } else if (match(TipoToken.FUNCAO, "function")) {
+            } else if (check(TipoToken.FUNCAO)) {
                 parseDeclaracaoFuncao();
             }
         }
     }
 
     private void parseDeclaracaoProcedimento() {
-        consume(TipoToken.PROCEDIMENTO, "Erro: Identificador esperado após 'procedure'");
+        match(TipoToken.PROCEDIMENTO, "procedure");
+        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após 'procedure'");
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador do procedimento");
         parseParametros();
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os parâmetros");
@@ -93,15 +94,14 @@ public class Parser {
     }
 
     private void parseDeclaracaoFuncao() {
-        consume(TipoToken.FUNCAO, "Erro: Identificador esperado após 'function'");
+        match(TipoToken.FUNCAO, "function");
         consume(TipoToken.IDENTIFICADOR, "Erro: esperado um identificador");
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador da função");
         parseParametros();
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os parâmetros");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado no início do bloco da função");
         parseBloco();
-        consume(TipoToken.RETORNO, "return", "Erro: esperado um return");
-        consume(TipoToken.PON_VIR, ";", "Erro: Falta um ponto e virgula ';'");
+        parseReturn();
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco da função");
     }
 
@@ -146,9 +146,27 @@ public class Parser {
     private void parseComandoPrint() {
         consume(TipoToken.PRINT, "Erro: 'print' esperado");
         consume(TipoToken.ABRE_PAREN, "Erro: '(' esperado após 'print'");
-        consume(TipoToken.STRING, "Erro: 'string' esperado após '('");
+        if (check(TipoToken.STRING)) {
+            consume(TipoToken.STRING, "Erro: 'string' esperado após '('");
+        } else if (check(TipoToken.IDENTIFICADOR)) {
+            consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após '('");
+        } else {
+            throw new RuntimeException("Erro: Esperado uma string ou identificador após '('");
+        }
         consume(TipoToken.FECHA_PAREN, "Erro: ')' esperado após 'string'");
         consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após o comando 'print'");
+    }
+
+    private void parseReturn() {
+        consume(TipoToken.RETORNO, "return", "Erro: 'return' esperado");
+
+        if (check(TipoToken.IDENTIFICADOR) || check(TipoToken.NUMERO) || check(TipoToken.STRING) || check(TipoToken.VERDADEIRO) || check(TipoToken.FALSO)) {
+            parseExpressao();
+        } else {
+            throw new RuntimeException("Erro: Esperado um identificador, número, string ou valor booleano após 'return'");
+        }
+
+        consume(TipoToken.PON_VIR, ";", "Erro: Falta um ponto e vírgula ';' após o retorno");
     }
 
     private void parseExpressao() {
@@ -192,15 +210,21 @@ public class Parser {
 
 
     private void parseParametros() {
-        if (check(TipoToken.IDENTIFICADOR)) {
-            consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado em parâmetros");
-            while (match(TipoToken.VIRGULA, ",")) {
-                consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após ','");
+        if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
+            consume(peek().getTipo(), "Erro: Tipo esperado em parâmetros");
+        }
+        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo ou se não houver tipo, logo após '('");
+
+        while (match(TipoToken.VIRGULA, ",")) {
+            if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
+                consume(peek().getTipo(), "Erro: Tipo esperado após ','");
             }
+            consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo ou ','");
         }
     }
 
     private void consume(TipoToken tipo, String erro) {
+        System.out.println("Esperando token: " + tipo + ", Token atual: " + peek());
         if (!check(tipo)) {
             System.out.println("Erro ao consumir token. Esperado: " + tipo + ", Encontrado: " + (peek() != null ? peek().getTipo() : "null"));
             throw new RuntimeException(erro);
