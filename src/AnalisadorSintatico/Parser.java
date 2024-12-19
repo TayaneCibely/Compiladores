@@ -28,10 +28,19 @@ public class Parser {
     }
 
     private void parseBloco() {
-        parseDeclaracaoVariaveis();
-        parseDeclaracaoSubrotinas();
-        parseComandos();
+        while (true) {
+            if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
+                parseDeclaracaoVariaveis();
+            } else if (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
+                parseDeclaracaoSubrotinas();
+            } else if (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if")) {
+                parseComando();
+            } else {
+                break;
+            }
+        }
     }
+    
 
     private void parseDeclaracaoVariaveis() {
         while (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
@@ -95,29 +104,26 @@ public class Parser {
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco da função");
     }
 
-    private void parseComandos() {
-        while (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if" )|| check(TipoToken.IDENTIFICADOR)) {
-            parseComando();
+    private void parseComando() {
+        if (check(TipoToken.WHILE, "while")) {
+            parseComandoWhile();
+        } else if (check(TipoToken.IF, "if")) {
+            parseComandoIf();
+        } else {
+            throw new RuntimeException("Erro: Comando inválido");
         }
     }
 
-    private void parseComando() {
-        if (match(TipoToken.WHILE, "while")) {
-            parseComandoWhile();
-        } else if (match(TipoToken.IF, "if")) {
-            parseComandoIf();
-        }
-    }
 
     private void parseComandoWhile() {
-        consume(TipoToken.WHILE, "while");
-        consume(TipoToken.ABRE_PAREN, "Erro: '(' esperado após 'while' ");
+        consume(TipoToken.WHILE, "while", "Erro: 'while' esperado");
+        consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após 'while'");
         parseExpressao();
-        consume(TipoToken.FECHA_PAREN, "ERRO: ')' esperado após a expressão no 'while");
-        consume(TipoToken.ABRE_CHAVES,"Erro: '{' esperado após ')'");
+        consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após a expressão no 'while'");
+        consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após ')'");
         parseBloco();
-        consume(TipoToken.FECHA_CHAVES, "Erro: '}' esperado após o bloco do 'while'");
-    }
+        consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'while'");
+    }      
 
     private void parseComandoIf() {
         consume(TipoToken.IF, "if");
