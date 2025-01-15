@@ -18,3 +18,8 @@
 │   └── Main.java
 └── README.md 
 ```
+
+## :octocat: Integrantes
+
+[Iasmin Raquel](https://github.com/iasmin-raquel) |
+[Tayane Rodrigues](https://github.com/TayaneCibely) |
