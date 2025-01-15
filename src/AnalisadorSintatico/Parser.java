@@ -99,8 +99,13 @@ public class Parser {
     private void parseDeclaracaoSubrotinas() {
         while (check(TipoToken.PROCEDIMENTO) || check(TipoToken.FUNCAO)) {
             if (check(TipoToken.PROCEDIMENTO)) {
+                Token procedimento = tokens.get(pos + 1);
+                adicionarSimbolo(procedimento, "procedure", null);
                 parseDeclaracaoProcedimento();
             } else if (check(TipoToken.FUNCAO)) {
+                Token funcao = tokens.get(pos + 1);
+                String tipoRetorno = tokens.get(pos + 2).getValor();
+                adicionarSimbolo(funcao, tipoRetorno, null);
                 parseDeclaracaoFuncao();
             }
         }
@@ -140,6 +145,7 @@ public class Parser {
             throw new RuntimeException("Erro: Comando inválido");
         }
     }
+    
 
     private void parseComandoWhile() {
         consume(TipoToken.WHILE, "while", "Erro: 'while' esperado");

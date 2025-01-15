@@ -3,6 +3,8 @@ main meuPrograma(){
         int resultado = num1 * num2;
         return resultado;
     }
+
+    multiplicacao(5,4);
 }
 end
 
