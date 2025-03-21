@@ -19,32 +19,35 @@ public class Parser {
             tabelaSimbolos.adicionarSimbolo(simbolo);
         }
     }
-     
-    public void parse() { 
-        try { parsePrograma(); 
-            System.out.println("Programa válido!!! \\-_-/"); 
-        } catch (RuntimeException e) { 
-            System.err.println("Erro de parsing: " + e.getMessage()); 
+
+    public void parse() {
+        try { parsePrograma();
+            System.out.println("Programa válido!!! \\-_-/");
+        } catch (RuntimeException e) {
+            System.err.println("Erro de parsing: " + e.getMessage());
         }
     }
 
     private void parsePrograma() {
         while (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool") ||
-               check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
-            
+                check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
+
             if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
                 parseDeclaracaoVariaveis();
             } else {
                 parseDeclaracaoSubrotinas();
             }
         }
-    
+
         consume(TipoToken.MAIN, "main", "Erro: 'main' esperado");
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após 'main'");
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após identificador");
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após '('");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após ')'");
+
+        tabelaSimbolos.entrarEscopo();
         parseBloco();
+
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após bloco");
         consume(TipoToken.END, "end", "Erro: 'end' esperado");
     }
@@ -74,23 +77,23 @@ public class Parser {
         if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
             String tipo = tokens.get(pos).getValor();
             consume(peek().getTipo(), "Erro: Tipo de variável esperado");
-            
+
             // Consome e adiciona o primeiro identificador
             Token identificador = tokens.get(pos);
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo");
-        
+
             String valor = null;
             if (match(TipoToken.OPE_ATRI, "=")) {
                 valor = tokens.get(pos).getValor();
                 parseExpressao();
             }
             adicionarSimbolo(identificador, tipo, valor);
-            
+
             // Verifica se há mais identificadores na declaração
             while (match(TipoToken.VIRGULA, ",")) {
                 identificador = tokens.get(pos);
                 consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após ','");
-        
+
                 if (match(TipoToken.OPE_ATRI, "=")) {
                     valor = tokens.get(pos).getValor();
                     parseExpressao();
@@ -99,12 +102,12 @@ public class Parser {
                 }
                 adicionarSimbolo(identificador, tipo, valor);
             }
-        
+
             consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado no final da declaração de variáveis");
         } else {
             throw new RuntimeException("Erro: Tipo de variável (int ou bool) esperado");
         }
-    }       
+    }
 
     private void parseDeclaracaoSubrotinas() {
         while (check(TipoToken.PROCEDIMENTO) || check(TipoToken.FUNCAO)) {
@@ -125,7 +128,10 @@ public class Parser {
         match(TipoToken.PROCEDIMENTO, "procedure");
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após 'procedure'");
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador do procedimento");
+
+        tabelaSimbolos.entrarEscopo();
         parseParametros();
+
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os parâmetros");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado no início do bloco do procedimento");
         parseBloco();
@@ -138,9 +144,12 @@ public class Parser {
         consume(TipoToken.INTEIRO, "Erro: Tipo de retorno esperado após 'function'");
         Token funcao = tokens.get(pos);
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador da função esperado após o tipo");
-        adicionarSimbolo(funcao, tipoRetorno, null); 
+        adicionarSimbolo(funcao, tipoRetorno, null);
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador da função");
+
+        tabelaSimbolos.entrarEscopo();
         parseParametros();
+
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os parâmetros");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado no início do bloco da função");
         parseBloco();
@@ -161,7 +170,7 @@ public class Parser {
             throw new RuntimeException("Erro: Comando inválido");
         }
     }
-    
+
     private void parseChamadaFuncao() {
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador de função esperado");
         consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador da função");
@@ -169,9 +178,9 @@ public class Parser {
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os argumentos");
         consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após a chamada da função");
     }
-    
+
     private void parseArgumentos() {
-        if (!check(TipoToken.FECHA_PAREN)) { 
+        if (!check(TipoToken.FECHA_PAREN)) {
             parseExpressao();
             while (match(TipoToken.VIRGULA, ",")) {
                 parseExpressao();
@@ -185,7 +194,10 @@ public class Parser {
         parseExpressao();
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após a expressão no 'while'");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após ')'");
+
+        tabelaSimbolos.entrarEscopo();
         parseBloco();
+
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'while'");
     }
 
@@ -195,12 +207,18 @@ public class Parser {
         parseExpressao();
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após a expressão");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após a expressão do 'if'");
+
+        tabelaSimbolos.entrarEscopo();
         parseBloco();
+
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'if'");
 
         if (match(TipoToken.ELSE, "else")) {
             consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após 'else'");
+
+            tabelaSimbolos.entrarEscopo();
             parseBloco();
+
             consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'else'");
         }
     }
@@ -277,19 +295,19 @@ public class Parser {
             consume(peek().getTipo(), "Erro: Tipo esperado em parâmetros");
             Token identificador = tokens.get(pos);
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após o tipo");
-            adicionarSimbolo(identificador, tipo, null); 
-            
+            adicionarSimbolo(identificador, tipo, null);
+
             if (!match(TipoToken.VIRGULA, ",")) break;
         }
     }
 
     private void consume(TipoToken tipo, String erro) {
-        System.out.println("Esperando token: " + tipo + ", Token atual: " + peek());
+//        System.out.println("Esperando token: " + tipo + ", Token atual: " + peek());
         if (!check(tipo)) {
             System.out.println("Erro ao consumir token. Esperado: " + tipo + ", Encontrado: " + (peek() != null ? peek().getTipo() : "null"));
             throw new RuntimeException(erro);
         }
-        System.out.println("Consumindo token: " + tokens.get(pos));
+//        System.out.println("Consumindo token: " + tokens.get(pos));
         pos++;
     }
 
@@ -298,10 +316,10 @@ public class Parser {
             System.out.println("Erro ao consumir token. Esperado: " + tipo + ", Encontrado: " + (peek() != null ? peek().getTipo() : "null"));
             throw new RuntimeException(erro);
         }
-        System.out.println("Consumindo token: " + tokens.get(pos));
+//        System.out.println("Consumindo token: " + tokens.get(pos));
         pos++;  // Consome o token e avança
         if (pos < tokens.size()) {
-            System.out.println("Próximo token: " + tokens.get(pos));
+//            System.out.println("Próximo token: " + tokens.get(pos));
         }
     }
 

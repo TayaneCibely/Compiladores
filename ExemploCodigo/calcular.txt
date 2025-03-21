@@ -1,0 +1,8 @@
+function int calcular(int x) {
+    int resultado = x * 2;
+    return resultado;
+}
+
+main programa() {
+    int resultado = 10;
+} end

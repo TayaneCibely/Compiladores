@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoArquivo = "ExemploCodigo/multiplicacao.txt";
+        String caminhoArquivo = "ExemploCodigo/calcular.txt";
 
         // lê o conteúdo do arquivo
         StringBuilder codigoFonte = new StringBuilder();
@@ -28,8 +28,8 @@ public class Main {
         List<Token> tokens = analisadorLexico.analisar();
 
         // Exibe os tokens gerados
-        System.out.println("\nTokens gerados:");
-        tokens.forEach(System.out::println);
+//        System.out.println("\nTokens gerados:");
+//        tokens.forEach(System.out::println);
 
        // System.out.println("\nLista de tokens antes do parse:"); 
        // tokens.forEach(token -> System.out.println(token.getTipo() + " " + token.getValor()));
