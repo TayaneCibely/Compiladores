@@ -3,6 +3,8 @@ function int calcular(int x) {
     return resultado;
 }
 
-main programa() {
-    int resultado = 10;
-} end
+main testeDuplicado() {
+    int x = 10;
+    int y = 20;
+}
+end
