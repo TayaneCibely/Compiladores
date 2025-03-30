@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TabelaSimbolos {
-//    private List<Simbolo> simbolos;
+    //    private List<Simbolo> simbolos;
     // criando uma pilha de escopos
     private boolean escopoAtivo = true;
     private List<Boolean> escoposAtivos = new ArrayList<>();
@@ -14,7 +14,6 @@ public class TabelaSimbolos {
 
 
     public TabelaSimbolos() {
-//        this.simbolos = new ArrayList<>();
         this.pilhaEscopos = new ArrayList<>();
         entrarEscopo();
     }
@@ -59,9 +58,16 @@ public class TabelaSimbolos {
         escopoAtual.put(simbolo.getIdentificador(), simbolo);
     }
 
-    public Map<Integer, List<String>> getDuplicacoesDetectadas() {
-        return duplicacoesDetectadas;
+    // registrar as variáveis utilizadas
+    private Map<String, List<Integer>> variaveisUtilizadas = new HashMap<>();
+
+    public void registrarUsoVariavel(String identificador, int linha) {
+        if (!variaveisUtilizadas.containsKey(identificador)) {
+            variaveisUtilizadas.put(identificador, new ArrayList<>());
+        }
+        variaveisUtilizadas.get(identificador).add(linha);
     }
+
 
     public Simbolo buscarSimbolo(String identificador) {
         for(int i = pilhaEscopos.size()-1; i>=0; i--) {
@@ -80,6 +86,14 @@ public class TabelaSimbolos {
             todosSimbolos.addAll(escopo.values());
         }
         return todosSimbolos;
+    }
+
+    public Map<Integer, List<String>> getDuplicacoesDetectadas() {
+        return duplicacoesDetectadas;
+    }
+
+    public Map<String, List<Integer>> getVariaveisUtilizadas() {
+        return variaveisUtilizadas;
     }
 
     @Override

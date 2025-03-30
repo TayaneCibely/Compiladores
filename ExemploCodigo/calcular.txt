@@ -1,10 +1,4 @@
-function int calcular(int x) {
-    int resultado = x * 2;
-    return resultado;
-}
-
-main testeDuplicado() {
+main teste() {
     int x = 10;
-    int y = 20;
 }
 end

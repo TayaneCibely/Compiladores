@@ -32,7 +32,7 @@ public class AnalisadorSemantico {
     }
 
     //  verificações semânticas
-    // verificar se existe mais de uma variável com o mesmo nome no mesmo escopo
+    //  verificar se existe mais de uma variável com o mesmo nome no mesmo escopo
     public void verificarDeclaracoesDuplicadas() {
         Map<Integer, List<String>> duplicacoes = tabelaSimbolos.getDuplicacoesDetectadas();
 
@@ -45,8 +45,30 @@ public class AnalisadorSemantico {
         }
     }
 
-    private void verificarVariaveisUtilizadas() {
+    // verificar se a variável foi declarada no código
+    public void verificarVariaveisUtilizadas() {
+        Map<String, List<Integer>> variaveisUsadas = tabelaSimbolos.getVariaveisUtilizadas();
 
+        for (Map.Entry<String, List<Integer>> entry : variaveisUsadas.entrySet()) {
+            String identificador = entry.getKey();
+            List<Integer> linhas = entry.getValue();
+
+            // ignorar valores literais
+            if (identificador.matches("\\d+") ||
+                    identificador.equals("true") ||
+                    identificador.equals("false") ||
+                    identificador.equals("return")) {
+                continue;
+            }
+
+            if (tabelaSimbolos.buscarSimbolo(identificador) == null) {
+                for (int linha : linhas) {
+                    errosSemanticos.add("Erro: Variável '" + identificador +
+                            "' utilizada na linha " + linha +
+                            " não foi declarada.");
+                }
+            }
+        }
     }
 
     private void verificarTiposCompativeis() {

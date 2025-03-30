@@ -185,6 +185,8 @@ public class Parser {
     }
 
     private void parseAtribuicao() {
+        Token idToken = tokens.get(pos);
+
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado");
         consume(TipoToken.OPE_ATRI, "=", "Erro: '=' esperado após identificador");
         parseExpressao();
@@ -308,8 +310,13 @@ public class Parser {
     }
 
     private void parseFator() {
-        if (check(TipoToken.IDENTIFICADOR) || check(TipoToken.NUMERO)) {
-            consume(peek().getTipo(), "Erro: Identificador ou número esperado");
+        if (check(TipoToken.IDENTIFICADOR)) {
+            // registrando o identificador na tabela de simbolos
+            Token idToken = tokens.get(pos);
+            tabelaSimbolos.registrarUsoVariavel(idToken.getValor(), idToken.getLinha());
+            consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado");
+        } else if (check(TipoToken.NUMERO)) {
+            consume(TipoToken.NUMERO, "Erro: Número esperado");
         } else if (match(TipoToken.ABRE_PAREN, "(")) {
             parseExpressao();
             consume(TipoToken.FECHA_PAREN, "Erro: ')' esperado após a expressão");
