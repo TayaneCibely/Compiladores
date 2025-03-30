@@ -71,8 +71,53 @@ public class AnalisadorSemantico {
         }
     }
 
-    private void verificarTiposCompativeis() {
+    public void verificarTiposCompativeis() {
+        List<Simbolo> simbolos = tabelaSimbolos.getSimbolos();
 
+        for (Simbolo simbolo : simbolos) {
+            if (simbolo.getValor() != null) {
+                String tipoVariavel = simbolo.getTipo();
+                String valor = simbolo.getValor();
+                String tipoExpressao = simbolo.getTipoExpressao();
+
+                // verificações baseadas no tipo detectado da expressão
+                if (tipoExpressao != null) {
+                    if (!tipoExpressao.equals(tipoVariavel)) {
+                        errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                                simbolo.getLinha() + ". Não é possível atribuir " +
+                                "um valor do tipo '" + tipoExpressao + "' a uma variável de tipo '" +
+                                tipoVariavel + "'.");
+                    }
+                }
+
+                else {
+                    // verificar se o valor é um número
+                    if (valor.matches("\\d+")) {
+                        if (!tipoVariavel.equals("int")) {
+                            errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                                    simbolo.getLinha() + ". Não é possível atribuir " +
+                                    "um valor inteiro a uma variável de tipo '" + tipoVariavel + "'.");
+                        }
+                    }
+
+                    // verificar se o valor é uma string (começa e termina com aspas)
+                    else if (valor.startsWith("\"") && valor.endsWith("\"")) {
+                        errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                                simbolo.getLinha() + ". Não é possível atribuir " +
+                                "um valor string a uma variável de tipo '" + tipoVariavel + "'.");
+                    }
+
+                    // verificar se o valor é booleano
+                    else if (valor.equals("true") || valor.equals("false")) {
+                        if (!tipoVariavel.equals("bool")) {
+                            errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                                    simbolo.getLinha() + ". Não é possível atribuir " +
+                                    "um valor booleano a uma variável de tipo '" + tipoVariavel + "'.");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void verificarRetornoFuncoes() {

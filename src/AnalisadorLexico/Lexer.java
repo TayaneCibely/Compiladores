@@ -93,6 +93,7 @@ public class Lexer {
             if (currentChar == '"') {
                 pos++;
                 StringBuilder conteudoString = new StringBuilder();
+                conteudoString.append('"');
                 while (pos < tamanho && codigoFonte.charAt(pos) != '"') {
                     if (codigoFonte.charAt(pos) == '\n') {
                         linhaAtual++;
@@ -101,6 +102,7 @@ public class Lexer {
                     pos++;
                 }
                 if (pos < tamanho && codigoFonte.charAt(pos) == '"') {
+                    conteudoString.append('"');
                     pos++;
                     tokens.add(new Token(TipoToken.STRING, conteudoString.toString(), linhaAtual));
                 } else {
