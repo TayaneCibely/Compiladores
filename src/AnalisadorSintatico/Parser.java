@@ -186,10 +186,44 @@ public class Parser {
 
     private void parseAtribuicao() {
         Token idToken = tokens.get(pos);
-
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado");
+
+        Simbolo simbolo = tabelaSimbolos.buscarSimbolo(idToken.getValor());
         consume(TipoToken.OPE_ATRI, "=", "Erro: '=' esperado após identificador");
+
+        int exprStartPos = pos;
         parseExpressao();
+
+        String valorExpressao = null;
+        String tipoExpressao = null;
+
+        if(exprStartPos < tokens.size()) {
+            Token valorToken = tokens.get(exprStartPos);
+
+            if (valorToken.getTipo() == TipoToken.NUMERO) {
+                valorExpressao = valorToken.getValor();
+                tipoExpressao = "int";
+            } else if (valorToken.getTipo() == TipoToken.STRING) {
+                valorExpressao = valorToken.getValor();
+                tipoExpressao = "string";
+            } else if (valorToken.getTipo() == TipoToken.VERDADEIRO ||
+                    valorToken.getTipo() == TipoToken.FALSO) {
+                valorExpressao = valorToken.getValor();
+                tipoExpressao = "bool";
+            } else if (valorToken.getTipo() == TipoToken.IDENTIFICADOR) {
+                valorExpressao = valorToken.getValor();
+                Simbolo simboloRef = tabelaSimbolos.buscarSimbolo(valorExpressao);
+                if (simboloRef != null) {
+                    tipoExpressao = simboloRef.getTipo();
+                }
+            }
+
+            if (simbolo != null) {
+                simbolo.setValor(valorExpressao);
+                simbolo.setTipoExpressao(tipoExpressao);
+            }
+        }
+
         consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após expressão");
     }
     
@@ -311,12 +345,17 @@ public class Parser {
 
     private void parseFator() {
         if (check(TipoToken.IDENTIFICADOR)) {
-            // registrando o identificador na tabela de simbolos
             Token idToken = tokens.get(pos);
             tabelaSimbolos.registrarUsoVariavel(idToken.getValor(), idToken.getLinha());
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado");
         } else if (check(TipoToken.NUMERO)) {
             consume(TipoToken.NUMERO, "Erro: Número esperado");
+        } else if (check(TipoToken.STRING)) {
+
+            consume(TipoToken.STRING, "Erro: String esperada");
+        } else if (check(TipoToken.VERDADEIRO) || check(TipoToken.FALSO)) {
+
+            consume(peek().getTipo(), "Erro: Valor booleano esperado");
         } else if (match(TipoToken.ABRE_PAREN, "(")) {
             parseExpressao();
             consume(TipoToken.FECHA_PAREN, "Erro: ')' esperado após a expressão");

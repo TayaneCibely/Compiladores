@@ -1,4 +1,4 @@
 main teste() {
-    int x = 10;
+    bool x = "askajsflkdjfsd";
 }
 end

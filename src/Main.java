@@ -36,6 +36,7 @@ public class Main {
         AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico(tabelaSimbolos);
         analisadorSemantico.verificarDeclaracoesDuplicadas();
         analisadorSemantico.verificarVariaveisUtilizadas();
+        analisadorSemantico.verificarTiposCompativeis();
 
         if (analisadorSemantico.temErros()) {
             System.out.println("\nErros semânticos encontrados:");
