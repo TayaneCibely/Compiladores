@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoArquivo = "ExemploCodigo/contador.txt";
+        String caminhoArquivo = "ExemploCodigo/calcular.txt";
 
         // lê o conteúdo do arquivo
         StringBuilder codigoFonte = new StringBuilder();
@@ -35,6 +35,7 @@ public class Main {
 
         AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico(tabelaSimbolos);
         analisadorSemantico.verificarDeclaracoesDuplicadas();
+        analisadorSemantico.verificarVariaveisUtilizadas();
 
         if (analisadorSemantico.temErros()) {
             System.out.println("\nErros semânticos encontrados:");
