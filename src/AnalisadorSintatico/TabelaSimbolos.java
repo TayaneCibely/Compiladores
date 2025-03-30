@@ -33,14 +33,34 @@ public class TabelaSimbolos {
         }
     }
 
+    private Map<Integer, List<String>> duplicacoesDetectadas = new HashMap<>();
+
     public void adicionarSimbolo(Simbolo simbolo) {
-//        simbolos.add(simbolo);
         if (pilhaEscopos.isEmpty()) {
             entrarEscopo();
         }
 
         Map<String, Simbolo> escopoAtual = pilhaEscopos.get(pilhaEscopos.size() - 1);
+        int escopoAtualIndice = pilhaEscopos.size() - 1;
+
+        if (escopoAtual.containsKey(simbolo.getIdentificador())) {
+            Simbolo simboloExistente = escopoAtual.get(simbolo.getIdentificador());
+
+            String mensagem = "Símbolo '" + simbolo.getIdentificador() +
+                    "' declarado múltiplas vezes no escopo " + escopoAtualIndice +
+                    " (linhas " + simboloExistente.getLinha() + " e " + simbolo.getLinha() + ")";
+
+            if (!duplicacoesDetectadas.containsKey(escopoAtualIndice)) {
+                duplicacoesDetectadas.put(escopoAtualIndice, new ArrayList<>());
+            }
+            duplicacoesDetectadas.get(escopoAtualIndice).add(mensagem);
+        }
+
         escopoAtual.put(simbolo.getIdentificador(), simbolo);
+    }
+
+    public Map<Integer, List<String>> getDuplicacoesDetectadas() {
+        return duplicacoesDetectadas;
     }
 
     public Simbolo buscarSimbolo(String identificador) {

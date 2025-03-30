@@ -1,3 +1,4 @@
+import AnalisadorSemantico.AnalisadorSemantico;
 import AnalisadorSintatico.*;
 import AnalisadorLexico.*;
 import java.io.BufferedReader;
@@ -23,21 +24,27 @@ public class Main {
 
         System.out.println(codigoFonte);
 
-        // Inicializa o Lexer e realiza a análise léxica
+        // inicializa o Lexer e realiza a análise léxica
         Lexer analisadorLexico = new Lexer(codigoFonte.toString());
         List<Token> tokens = analisadorLexico.analisar();
 
-        // Exibe os tokens gerados
-//        System.out.println("\nTokens gerados:");
-//        tokens.forEach(System.out::println);
-
-       // System.out.println("\nLista de tokens antes do parse:"); 
-       // tokens.forEach(token -> System.out.println(token.getTipo() + " " + token.getValor()));
-
-        //Inicializa o Parser e realiza a análise sintática
+        // análise sintática
         TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
         Parser analisadorSintatico = new Parser(tokens, tabelaSimbolos);
         analisadorSintatico.parse();
+
+        AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico(tabelaSimbolos);
+        analisadorSemantico.verificarDeclaracoesDuplicadas();
+
+        if (analisadorSemantico.temErros()) {
+            System.out.println("\nErros semânticos encontrados:");
+            for (String erro : analisadorSemantico.getErrosSemanticos()) {
+                System.out.println(erro);
+            }
+        } else {
+            System.out.println("\nNenhum erro semântico encontrado.");
+        }
+
 
         System.out.println("\nTabela de Símbolos:");
         System.out.println(tabelaSimbolos);

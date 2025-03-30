@@ -22,7 +22,7 @@ public class Parser {
 
     public void parse() {
         try { parsePrograma();
-            System.out.println("Programa válido!!! \\-_-/");
+            System.out.println("Programa sem erros léxicos ou sintáticos");
         } catch (RuntimeException e) {
             System.err.println("Erro de parsing: " + e.getMessage());
         }
@@ -338,8 +338,6 @@ public class Parser {
         }
         return false;
     }
-
-    //Metódos auxiliares para
 
     //verificar o próximo token na lista de tokens sem consumi-lo
     private Token peek(){
