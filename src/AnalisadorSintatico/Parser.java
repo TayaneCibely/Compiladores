@@ -53,15 +53,13 @@ public class Parser {
     }
 
     private void parseBloco() {
-        while (true) {
+        while (!check(TipoToken.FECHA_CHAVES, "}")) {
             if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
                 parseDeclaracaoVariaveis();
-            }  else if (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
+            } else if (check(TipoToken.PROCEDIMENTO, "procedure") || check(TipoToken.FUNCAO, "function")) {
                 parseDeclaracaoSubrotinas();
-            } else if (check(TipoToken.WHILE, "while") || check(TipoToken.IF, "if") || check(TipoToken.PRINT, "print")) {
-                parseComando();
             } else {
-                break;
+                parseComando();
             }
         }
     }
@@ -89,7 +87,6 @@ public class Parser {
             }
             adicionarSimbolo(identificador, tipo, valor);
 
-            // Verifica se há mais identificadores na declaração
             while (match(TipoToken.VIRGULA, ",")) {
                 identificador = tokens.get(pos);
                 consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado após ','");
@@ -136,25 +133,31 @@ public class Parser {
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado no início do bloco do procedimento");
         parseBloco();
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do procedimento");
+        tabelaSimbolos.sairEscopo();
     }
 
     private void parseDeclaracaoFuncao() {
         match(TipoToken.FUNCAO, "function");
+    
+        if (!check(TipoToken.INTEIRO, "int") && !check(TipoToken.BOOLEANO, "bool")) {
+            throw new RuntimeException("Erro: Tipo de retorno inválido");
+        }
         String tipoRetorno = tokens.get(pos).getValor();
-        consume(TipoToken.INTEIRO, "Erro: Tipo de retorno esperado após 'function'");
+        pos++;
         Token funcao = tokens.get(pos);
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador da função esperado após o tipo");
         adicionarSimbolo(funcao, tipoRetorno, null);
-        consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador da função");
-
+        consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após o identificador da função"); // Assegura que o próximo token é '('
+    
         tabelaSimbolos.entrarEscopo();
         parseParametros();
-
+    
         consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após os parâmetros");
         consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado no início do bloco da função");
         parseBloco();
         parseReturn();
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco da função");
+        tabelaSimbolos.sairEscopo();
     }
 
     private void parseComando() {
@@ -165,10 +168,37 @@ public class Parser {
         } else if (check(TipoToken.PRINT, "print")) {
             parseComandoPrint();
         } else if (check(TipoToken.IDENTIFICADOR)) {
-            parseChamadaFuncao();
-        }else {
+            if (tokens.size() > pos + 1 && tokens.get(pos + 1).getTipo() == TipoToken.OPE_ATRI) {
+                parseAtribuicao();
+            } else {
+                parseChamadaFuncao();
+            }
+        } else if(check(TipoToken.BREAK, "break")){
+            parseComandoBreak();
+        } else if(check(TipoToken.CONTINUE, "continue")){
+            parseComandoContinue();
+        } else if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
+            parseDeclaracaoVariavel();
+        } else {
             throw new RuntimeException("Erro: Comando inválido");
         }
+    }
+
+    private void parseAtribuicao() {
+        consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado");
+        consume(TipoToken.OPE_ATRI, "=", "Erro: '=' esperado após identificador");
+        parseExpressao();
+        consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após expressão");
+    }
+    
+    private void parseComandoBreak(){
+        consume(TipoToken.BREAK, "break", "Erro: 'break' esperado");
+        consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após o comando 'break'");
+    }
+
+    private void parseComandoContinue() {
+        consume(TipoToken.CONTINUE, "continue", "Erro: 'continue' esperado");
+        consume(TipoToken.PON_VIR, ";", "Erro: ';' esperado após o comando 'continue'");
     }
 
     private void parseChamadaFuncao() {

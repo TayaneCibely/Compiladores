@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoArquivo = "ExemploCodigo/calcular.txt";
+        String caminhoArquivo = "ExemploCodigo/contador.txt";
 
         // lê o conteúdo do arquivo
         StringBuilder codigoFonte = new StringBuilder();

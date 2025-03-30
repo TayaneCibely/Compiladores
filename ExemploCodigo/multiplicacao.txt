@@ -1,9 +1,9 @@
-function int multiplicacao(int num1, int num2){
+function int multiplicacao(int num1, int num2) {
     int resultado = num1 * num2;
     return resultado;
 }
 
-main meuPrograma(){
-    multiplicacao(5,4);
+main meuPrograma() {
+    multiplicacao(5, 4);
 }
 end
