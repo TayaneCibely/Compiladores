@@ -75,45 +75,39 @@ public class AnalisadorSemantico {
         List<Simbolo> simbolos = tabelaSimbolos.getSimbolos();
 
         for (Simbolo simbolo : simbolos) {
+            // ignorar símbolos do tipo "return"
+            if (simbolo.getTipo() != null && simbolo.getTipo().equals("return")) {
+                continue;
+            }
+
             if (simbolo.getValor() != null) {
                 String tipoVariavel = simbolo.getTipo();
                 String valor = simbolo.getValor();
                 String tipoExpressao = simbolo.getTipoExpressao();
 
-                // verificações baseadas no tipo detectado da expressão
-                if (tipoExpressao != null) {
-                    if (!tipoExpressao.equals(tipoVariavel)) {
-                        errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
-                                simbolo.getLinha() + ". Não é possível atribuir " +
-                                "um valor do tipo '" + tipoExpressao + "' a uma variável de tipo '" +
-                                tipoVariavel + "'.");
-                    }
+                if (tipoExpressao != null && !tipoExpressao.equals(tipoVariavel)) {
+                    errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                            simbolo.getLinha() + ". Não é possível atribuir " +
+                            "um valor do tipo '" + tipoExpressao + "' a uma variável de tipo '" +
+                            tipoVariavel + "'.");
                 }
-
-                else {
-                    // verificar se o valor é um número
-                    if (valor.matches("\\d+")) {
-                        if (!tipoVariavel.equals("int")) {
-                            errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
-                                    simbolo.getLinha() + ". Não é possível atribuir " +
-                                    "um valor inteiro a uma variável de tipo '" + tipoVariavel + "'.");
-                        }
-                    }
-
-                    // verificar se o valor é uma string (começa e termina com aspas)
-                    else if (valor.startsWith("\"") && valor.endsWith("\"")) {
+                // verificações baseadas no valor
+                else if (tipoExpressao == null) {
+                    // numeros
+                    if (valor.matches("\\d+") && !tipoVariavel.equals("int")) {
                         errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
                                 simbolo.getLinha() + ". Não é possível atribuir " +
-                                "um valor string a uma variável de tipo '" + tipoVariavel + "'.");
+                                "um valor inteiro a uma variável de tipo '" + tipoVariavel + "'.");
+                    } else if ((valor.equals("true") || valor.equals("false")) && !tipoVariavel.equals("bool")) {
+                        errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                                simbolo.getLinha() + ". Não é possível atribuir " +
+                                "um valor booleano a uma variável de tipo '" + tipoVariavel + "'.");
                     }
-
-                    // verificar se o valor é booleano
-                    else if (valor.equals("true") || valor.equals("false")) {
-                        if (!tipoVariavel.equals("bool")) {
-                            errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
-                                    simbolo.getLinha() + ". Não é possível atribuir " +
-                                    "um valor booleano a uma variável de tipo '" + tipoVariavel + "'.");
-                        }
+                    // Verificação para strings
+                    else if ((valor.startsWith("\"") && valor.endsWith("\"")) && !tipoVariavel.equals("string")) {
+                        errosSemanticos.add("Erro: Incompatibilidade de tipos na linha " +
+                                simbolo.getLinha() + ". Não é possível atribuir " +
+                                "uma string a uma variável de tipo '" + tipoVariavel + "'.");
                     }
                 }
             }
@@ -121,7 +115,82 @@ public class AnalisadorSemantico {
     }
 
     private void verificarRetornoFuncoes() {
+        List<Simbolo> simbolos = tabelaSimbolos.getSimbolos();
 
+        // identificar funções
+        Map<String, String> funcoes = new HashMap<>();
+        for (Simbolo simbolo : simbolos) {
+            if (simbolo.getTipo() != null &&
+                    !simbolo.getTipo().equals("procedure") &&
+                    !simbolo.getIdentificador().equals("main") &&
+                    simbolo.getValor() == null &&
+                    tabelaSimbolos.getEscopoDoSimbolo(simbolo.getIdentificador()) == 0) {
+                funcoes.put(simbolo.getIdentificador(), simbolo.getTipo());
+            }
+        }
+
+        // agrupar os returns por função
+        Map<String, List<Simbolo>> returnsAgrupados = new HashMap<>();
+
+        // inicializar a lista para cada função
+        for (String nomeFuncao : funcoes.keySet()) {
+            returnsAgrupados.put(nomeFuncao, new ArrayList<>());
+        }
+
+        // associar cada return à sua função pai
+        for (Simbolo simbolo : simbolos) {
+            if (simbolo.getIdentificador() != null &&
+                    simbolo.getIdentificador().equals("return") &&
+                    simbolo.getFuncaoPai() != null) {
+
+                String funcaoPai = simbolo.getFuncaoPai();
+                if (funcoes.containsKey(funcaoPai)) {
+                    returnsAgrupados.get(funcaoPai).add(simbolo);
+                }
+            }
+        }
+
+        // verificar cada função e  returns
+        for (Map.Entry<String, String> entry : funcoes.entrySet()) {
+            String nomeFuncao = entry.getKey();
+            String tipoFuncao = entry.getValue();
+            List<Simbolo> returns = returnsAgrupados.get(nomeFuncao);
+
+            if (returns.isEmpty()) {
+                errosSemanticos.add("Erro: Função '" + nomeFuncao +
+                        "' do tipo '" + tipoFuncao +
+                        "' não possui comando de retorno.");
+                continue;
+            }
+
+            for (Simbolo returnSimbolo : returns) {
+                String valorRetorno = returnSimbolo.getValor();
+                String tipoRetorno = determinarTipoValor(valorRetorno);
+
+                if (tipoRetorno != null && !tipoRetorno.equals(tipoFuncao)) {
+                    errosSemanticos.add("Erro: Incompatibilidade de tipos no retorno da função '" +
+                            nomeFuncao + "'. Esperado '" + tipoFuncao +
+                            "', encontrado '" + tipoRetorno + "' na linha " +
+                            returnSimbolo.getLinha() + ".");
+                }
+            }
+        }
+    }
+
+    private String determinarTipoValor(String valor) {
+        if (valor.matches("\\d+")) {
+            return "int";
+        } else if (valor.equals("true") || valor.equals("false")) {
+            return "bool";
+        } else if (valor.startsWith("\"") && valor.endsWith("\"")) {
+            return "string";
+        } else {
+            Simbolo varRetorno = tabelaSimbolos.buscarSimbolo(valor);
+            if (varRetorno != null) {
+                return varRetorno.getTipo();
+            }
+        }
+        return null;
     }
 
     public List<String> getErrosSemanticos() {

@@ -62,13 +62,11 @@ public class Parser {
     }
 
     private void parseBloco() {
-        while (!check(TipoToken.FECHA_CHAVES, "}") &&
-                !check(TipoToken.RETORNO, "return")) {
-
-            if (debug) System.out.println("DEBUG: Processando conteúdo do bloco: " + peek());
-
+        while (!check(TipoToken.FECHA_CHAVES, "}")) {
             if (check(TipoToken.INTEIRO, "int") || check(TipoToken.BOOLEANO, "bool")) {
                 parseDeclaracaoVariaveis();
+            } else if (check(TipoToken.RETORNO)) {
+                parseReturn();
             } else {
                 parseComando();
             }
@@ -192,6 +190,8 @@ public class Parser {
         tabelaSimbolos.sairEscopo();
     }
 
+    private String funcaoAtual = null;
+
     private void parseDeclaracaoFuncao() {
         if (debug) System.out.println("DEBUG: Processando declaração de função: " + peek());
 
@@ -205,6 +205,9 @@ public class Parser {
         consume(peek().getTipo(), "Erro: Tipo de retorno esperado");
 
         Token funcao = tokens.get(pos);
+        String nomeFuncao = funcao.getValor();
+        this.funcaoAtual = nomeFuncao;
+
         consume(TipoToken.IDENTIFICADOR, "Erro: Identificador da função esperado após o tipo");
         adicionarSimbolo(funcao, tipoRetorno, null);
 
@@ -224,6 +227,8 @@ public class Parser {
 
         consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco da função");
         tabelaSimbolos.sairEscopo();
+
+        this.funcaoAtual = null;
     }
 
     private void parseComando() {
@@ -367,10 +372,8 @@ public class Parser {
 
         if (match(TipoToken.ELSE, "else")) {
             consume(TipoToken.ABRE_CHAVES, "{", "Erro: '{' esperado após 'else'");
-
             tabelaSimbolos.entrarEscopo();
             parseBloco();
-
             consume(TipoToken.FECHA_CHAVES, "}", "Erro: '}' esperado após o bloco do 'else'");
             tabelaSimbolos.sairEscopo();
         }
@@ -415,7 +418,10 @@ public class Parser {
             }
 
             Simbolo simboloReturn = new Simbolo("return", "return", returnToken.getLinha(), valorRetorno);
+            // definir a função pai do return
+            simboloReturn.setFuncaoPai(funcaoAtual);
             tabelaSimbolos.adicionarSimbolo(simboloReturn);
+
 
             parseExpressao();
         } else {
@@ -467,6 +473,12 @@ public class Parser {
             Token idToken = tokens.get(pos);
             tabelaSimbolos.registrarUsoVariavel(idToken.getValor(), idToken.getLinha());
             consume(TipoToken.IDENTIFICADOR, "Erro: Identificador esperado");
+
+            if (check(TipoToken.ABRE_PAREN)) {
+                consume(TipoToken.ABRE_PAREN, "(", "Erro: '(' esperado após identificador de função");
+                parseArgumentos();
+                consume(TipoToken.FECHA_PAREN, ")", "Erro: ')' esperado após argumentos");
+            }
         } else if (check(TipoToken.NUMERO)) {
             consume(TipoToken.NUMERO, "Erro: Número esperado");
         } else if (check(TipoToken.STRING)) {

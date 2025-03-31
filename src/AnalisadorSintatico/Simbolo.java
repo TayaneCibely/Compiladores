@@ -6,6 +6,7 @@ public class Simbolo {
     private int linha;
     private String valor;
     private String tipoExpressao;
+    private String funcaoPai;
 
     public Simbolo(String identificador, String tipo, int linha, String valor) {
         this.identificador = identificador;
@@ -50,6 +51,10 @@ public class Simbolo {
     public String getTipoExpressao() { return tipoExpressao; }
 
     public void setTipoExpressao(String tipoExpressao) { this.tipoExpressao = tipoExpressao; }
+
+    public String getFuncaoPai() { return funcaoPai; }
+
+    public void setFuncaoPai(String funcaoPai) { this.funcaoPai = funcaoPai; }
 
     @Override
     public String toString() {
