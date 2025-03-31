@@ -32,6 +32,7 @@ public class Main {
             Lexer analisadorLexico = new Lexer(codigoFonte.toString());
             List<Token> tokens = analisadorLexico.analisar();
 
+
             // Análise Sintática
             System.out.println("Realizando análise sintática...");
             TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
