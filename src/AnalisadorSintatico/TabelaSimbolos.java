@@ -79,6 +79,16 @@ public class TabelaSimbolos {
         return null;
     }
 
+    public int getEscopoDoSimbolo(String identificador) {
+        for (int i = 0; i < pilhaEscopos.size(); i++) {
+            Map<String, Simbolo> escopo = pilhaEscopos.get(i);
+            if (escopo.containsKey(identificador)) {
+                return i;
+            }
+        }
+        return -1; // Não encontrado
+    }
+
     // recuperar todos os símbolos
     public List<Simbolo> getSimbolos() {
         List<Simbolo> todosSimbolos = new ArrayList<>();
