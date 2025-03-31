@@ -22,34 +22,45 @@ public class Main {
             return;
         }
 
+        System.out.println("\n==== Código Fonte ====\n");
         System.out.println(codigoFonte);
+        System.out.println("=====================\n");
 
-        // inicializa o Lexer e realiza a análise léxica
-        Lexer analisadorLexico = new Lexer(codigoFonte.toString());
-        List<Token> tokens = analisadorLexico.analisar();
+        try {
+            // Análise Léxica
+            System.out.println("Realizando análise léxica...");
+            Lexer analisadorLexico = new Lexer(codigoFonte.toString());
+            List<Token> tokens = analisadorLexico.analisar();
 
-        // análise sintática
-        TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
-        Parser analisadorSintatico = new Parser(tokens, tabelaSimbolos);
-        analisadorSintatico.parse();
 
-        AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico(tabelaSimbolos);
-        analisadorSemantico.verificarDeclaracoesDuplicadas();
-        analisadorSemantico.verificarVariaveisUtilizadas();
-        analisadorSemantico.verificarTiposCompativeis();
+            // Análise Sintática
+            System.out.println("Realizando análise sintática...");
+            TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
+            Parser analisadorSintatico = new Parser(tokens, tabelaSimbolos);
+            analisadorSintatico.parse();
 
-        if (analisadorSemantico.temErros()) {
-            System.out.println("\nErros semânticos encontrados:");
-            for (String erro : analisadorSemantico.getErrosSemanticos()) {
-                System.out.println(erro);
+            // Análise Semântica
+            System.out.println("Realizando análise semântica...");
+            AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico(tabelaSimbolos);
+            boolean analiseSemanticaSucesso = analisadorSemantico.analisar();
+
+            if (!analiseSemanticaSucesso) {
+                System.out.println("\n==== Erros Semânticos ====");
+                for (String erro : analisadorSemantico.getErrosSemanticos()) {
+                    System.out.println(erro);
+                }
+                System.out.println("=======================");
+            } else {
+                System.out.println("\n✓ Nenhum erro semântico encontrado.");
             }
-        } else {
-            System.out.println("\nNenhum erro semântico encontrado.");
+
+            System.out.println("\n==== Tabela de Símbolos ====");
+            System.out.println(tabelaSimbolos);
+            System.out.println("=========================");
+
+        } catch (Exception e) {
+            System.err.println("Erro durante o processo de compilação: " + e.getMessage());
+            e.printStackTrace();
         }
-
-
-        System.out.println("\nTabela de Símbolos:");
-        System.out.println(tabelaSimbolos);
-
     }
 }
