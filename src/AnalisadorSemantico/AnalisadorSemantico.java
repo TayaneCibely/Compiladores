@@ -200,5 +200,4 @@ public class AnalisadorSemantico {
     public boolean temErros() {
         return !errosSemanticos.isEmpty();
     }
-
 }

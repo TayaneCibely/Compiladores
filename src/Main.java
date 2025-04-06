@@ -1,5 +1,7 @@
 import AnalisadorSemantico.AnalisadorSemantico;
 import AnalisadorSintatico.*;
+import GeradorCodigo.GeradorCodigo;
+import GeradorCodigo.GeradorCodigoTresEnderecos;
 import AnalisadorLexico.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,7 +10,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoArquivo = "ExemploCodigo/calcular.txt";
+        String caminhoArquivo = "ExemploCodigo/teste.txt";
 
         // lê o conteúdo do arquivo
         StringBuilder codigoFonte = new StringBuilder();
@@ -36,7 +38,8 @@ public class Main {
             // Análise Sintática
             System.out.println("Realizando análise sintática...");
             TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
-            Parser analisadorSintatico = new Parser(tokens, tabelaSimbolos);
+            GeradorCodigo geradorCodigoBasico = new GeradorCodigo();
+            Parser analisadorSintatico = new Parser(tokens, tabelaSimbolos, geradorCodigoBasico);
             analisadorSintatico.parse();
 
             // Análise Semântica
@@ -57,6 +60,14 @@ public class Main {
             System.out.println("\n==== Tabela de Símbolos ====");
             System.out.println(tabelaSimbolos);
             System.out.println("=========================");
+
+            // Geração do Código de Três Endereços
+            System.out.println("Gerando o código de três endereços...");
+            GeradorCodigoTresEnderecos gerador = new GeradorCodigoTresEnderecos(tabelaSimbolos);
+            gerador.gerarCodigo(tokens);
+            gerador.imprimirCodigo();
+            
+            System.out.println("===============================");
 
         } catch (Exception e) {
             System.err.println("Erro durante o processo de compilação: " + e.getMessage());

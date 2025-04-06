@@ -1,0 +1,29 @@
+int a = 10;
+int b = 20;
+bool flag = true;
+
+function int soma(int x, int y) {
+    return x + y;
+}
+
+procedure imprime(int valor) {
+    print(valor);
+}
+
+main programa() {
+    int resultado;
+    resultado = soma(a, b);
+    imprime(resultado);
+    
+    if (resultado > 10) {
+        print("Resultado maior que 10");
+    } else {
+        print("Resultado menor ou igual a 10");
+    }
+    
+    int i = 0;
+    while (i < 5) {
+        print(i);
+        i = i + 1;
+    }
+}

@@ -15,6 +15,9 @@
 │   │   ├── Parser.java
 │   │   ├── Simbolo.java
 │   │   └── TabelaSimbolos.java
+|   ├── AnalisadorSemantico/
+│   │   ├── AnalisadorSemantico.java
+│   │   └── Simbolo.java
 │   └── Main.java
 └── README.md 
 ```

@@ -58,11 +58,6 @@ public class Simbolo {
 
     @Override
     public String toString() {
-        return "Simbolo{" +
-                "identificador='" + identificador + '\'' +
-                ", tipo='" + tipo + '\'' +
-                ", linha=" + linha +
-                ", valor='" + valor + '\'' +
-                '}';
+        return identificador + ":" + tipo + "(linha " + linha + (valor != null ? ", valor"+ valor : "") + ")";
     }
 }

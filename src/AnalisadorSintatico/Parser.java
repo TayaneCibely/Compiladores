@@ -1,17 +1,25 @@
 package AnalisadorSintatico;
 
 import AnalisadorLexico.*;
+import GeradorCodigo.GeradorCodigo;
 import java.util.List;
 
 public class Parser {
     private final List<Token> tokens;
     private int pos = 0;
     private TabelaSimbolos tabelaSimbolos;
+    private GeradorCodigo geradorCodigo;
     private boolean debug = false;
 
     public Parser(List<Token> tokens, TabelaSimbolos tabelaSimbolos) {
         this.tokens = tokens;
         this.tabelaSimbolos = tabelaSimbolos;
+    }
+
+    public Parser(List<Token> tokens, TabelaSimbolos tabelaSimbolos, GeradorCodigo geradorCodigo) {
+        this.tokens = tokens;
+        this.tabelaSimbolos = tabelaSimbolos;
+        this.geradorCodigo = geradorCodigo;
     }
 
     private void adicionarSimbolo(Token token, String tipo, String valor) {
