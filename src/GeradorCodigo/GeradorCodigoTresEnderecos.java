@@ -16,6 +16,7 @@ public class GeradorCodigoTresEnderecos {
     private int tempCounter;
     private int labelCounter;
     private Map<String, String> variaveisTemporarias;
+    private GeradorCodigo geradorCodigoDragon;
 
     public GeradorCodigoTresEnderecos(TabelaSimbolos tabelaSimbolos) {
         this.tabelaSimbolos = tabelaSimbolos;
@@ -23,6 +24,7 @@ public class GeradorCodigoTresEnderecos {
         this.tempCounter = 0;
         this.labelCounter = 0;
         this.variaveisTemporarias = new HashMap<>();
+        this.geradorCodigoDragon = new GeradorCodigo();
     }
 
     public void gerarCodigo(List<Token> tokens) {
@@ -139,8 +141,8 @@ public class GeradorCodigoTresEnderecos {
                     pos++;
                 }
             }
-            codigo.add(new Instrucao(null, "retorno", null, null, null)); // Adicionar instrução de retorno ao final da
-                                                                          // função
+            codigo.add(new Instrucao(null, "retorno", null, null, null)); 
+                                                                    
         }
         return pos;
     }
@@ -494,12 +496,6 @@ public class GeradorCodigoTresEnderecos {
         return prefixo + "_" + (labelCounter++);
     }
 
-    public void imprimirCodigo() {
-        System.out.println("\n=== Código de Três Endereços ===");
-        for (Instrucao instr : codigo) {
-            System.out.println(instr);
-        }
-    }
 
     public static class Instrucao {
         private String resultado;
@@ -533,7 +529,7 @@ public class GeradorCodigoTresEnderecos {
                     sb.append("goto ").append(op1);
                     break;
                 case "if_false":
-                    sb.append("if (").append(op1).append(" == false) goto ").append(op2);
+                    sb.append("if NOT(").append(op1).append(") goto ").append(op2);
                     break;
                 case "print":
                     sb.append("print ").append(op1);
@@ -566,6 +562,19 @@ public class GeradorCodigoTresEnderecos {
                 sb.append(" # ").append(comentario);
             }
             return sb.toString();
+        }
+    }
+
+    public void imprimirCodigo() {
+        System.out.println("\n=== Código de Três Endereços ===");
+        List<String> codigoString = new ArrayList<>();
+        for (Instrucao instr : codigo) {
+            System.out.println(instr);
+        }
+        List<String> codigoDragon = geradorCodigoDragon.converterCodigoExistente(codigoString);
+        System.out.println("\n===== Código de Três Endereços (Formato Dragon Book) =====");
+        for (String linha : codigoDragon) {
+            System.out.println(linha);
         }
     }
 }

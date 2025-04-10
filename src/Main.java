@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoArquivo = "ExemploCodigo/teste.txt";
+        String caminhoArquivo = "ExemploCodigo/multiplicacao.txt";
 
         // lê o conteúdo do arquivo
         StringBuilder codigoFonte = new StringBuilder();

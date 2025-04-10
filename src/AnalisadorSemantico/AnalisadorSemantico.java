@@ -21,7 +21,6 @@ public class AnalisadorSemantico {
         verificarRetornoFuncoes();
 
         if (!errosSemanticos.isEmpty()) {
-            System.err.println("\n=== Erros Semânticos ===");
             for (String erro : errosSemanticos) {
                 System.err.println(erro);
             }
